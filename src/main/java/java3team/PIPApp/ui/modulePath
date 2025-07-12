@@ -1,0 +1,3 @@
+권혁주 javaFX VM 옵션
+------------
+--module-path ""C:\Users\USER\Desktop\JavaFX\javafx-sdk-21.0.7\lib"" --add-modules javafx.controls,javafx.fxml --add-exports javafx.base/com.sun.javafx.event=ALL-UNNAMED
