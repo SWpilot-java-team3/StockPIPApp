@@ -19,6 +19,13 @@ import java.util.List;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
 
+// ✅ 추가: 스케줄러 관련 클래스 임포트
+//import java.util.concurrent.Executors;
+//import java.util.concurrent.ScheduledExecutorService;
+//import java.util.concurrent.TimeUnit;
+//import service.AlertService;
+//import service.StockService;
+
 public class Home_Controller {
     @FXML private ListView<String> listViewId;
 
@@ -30,6 +37,8 @@ public class Home_Controller {
 
     @FXML private Label warningMessageLabel; // 경고 메시지용
 
+    // ✅ 추가: 주기적인 작업을 위한 스케줄러 선언
+    private ScheduledExecutorService scheduler;
 
     /// API 연동 및 보완 필요 . 회사이름 -> 자동 완성 모듈. 회사 이름만 받아와서 리스트 형태로 담고 있음
     @FXML
@@ -56,6 +65,8 @@ public class Home_Controller {
             if (AppConstants.refreshSecond != 0) {
                 refreshField_Second.setText(String.valueOf(AppConstants.refreshSecond));
             }
+
+            //startPriceMonitoring(); //  가격 모니터링 시작 호출
         }
     }
 
@@ -160,6 +171,7 @@ public class Home_Controller {
             listViewId.getItems().add(AppConstants.name);
         }
 
+        //startPriceMonitoring(); //가격 모니터링 시작 또는 재시작
 
         // 저장완료 팝업
         showAlert("StockPIP", "성공적으로 저장되었습니다!");
@@ -293,4 +305,34 @@ public class Home_Controller {
             e.printStackTrace();
         }
     }
+}
+
+// ✅ 가격 모니터링 시작 메서드 //추가되어야할것
+private void startPriceMonitoring() {
+    // 기존 스케줄러가 있다면 종료 (새로운 모니터링 시작 시 이전 스케줄러 정리)
+    if (scheduler != null && !scheduler.isShutdown()) {
+        scheduler.shutdownNow();
+        System.out.println("기존 스케줄러 종료");
+    }
+
+    // 새로고침 주기 계산 (초 단위)
+    int refreshTotalSeconds = (AppConstants.refreshMinute * 60) + AppConstants.refreshSecond;
+    if (refreshTotalSeconds <= 0) {
+        System.err.println("새로고침 주기가 유효하지 않습니다.");
+        return;
+    }
+
+    // 새 스케줄러 생성 및 작업 예약
+    scheduler = Executors.newSingleThreadScheduledExecutor();
+    scheduler.scheduleAtFixedRate(() -> {
+        // API를 통해 실시간 가격 정보 불러오기
+        // AppConstants.ticker를 사용하여 해당 종목의 현재가 가져오기
+        StockService.fetchRealtimeQuote(AppConstants.ticker);
+
+        // 불러온 현재가와 목표가/손절가 비교하여 알림
+        // AppConstants에 저장된 값을 자동으로 사용하여 알림 조건을 체크합니다.
+        AlertService.checkPriceAndAlert();
+    }, 0, refreshTotalSeconds, TimeUnit.SECONDS); // 0초 지연 후, refreshTotalSeconds 간격으로 반복 실행
+
+    System.out.println("가격 모니터링 시작: " + refreshTotalSeconds + "초 간격");
 }
