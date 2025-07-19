@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.URI;
 import config.*;
 
+import static config.StockLIst.stocks;
+
 public class AssetInfo_Controller {
     @FXML private Label nameLabel;      // 회사명
     @FXML private Label tickerLabel;    // 티커
@@ -36,22 +38,26 @@ public class AssetInfo_Controller {
     @FXML
     public void initialize() {
         // ComboBox에 NameList 넣기 (이름 목록만 보여줌)
-        comboBoxID.getItems().setAll(AppConstants.NameList);
+        for(AppConstants stock : stocks){
+            comboBoxID.getItems().setAll(stock.name);
+            // 현재 선택된 name이 있다면 그것도 선택해줌 (선택 유지 목적)
+            if (stocks.contains(stock)) {
+                comboBoxID.setValue(stock.name);
+            }
 
-        // 현재 선택된 name이 있다면 그것도 선택해줌 (선택 유지 목적)
-        if (AppConstants.NameList.contains(AppConstants.name)) {
-            comboBoxID.setValue(AppConstants.name);
         }
 
+        ///  나중에 버튼 클릭 이벤트 추가해야함
+        AppConstants ViewStock = stocks.get(stocks.indexOf(AppConstants.name));
 
-        nameLabel.setText(AppConstants.name);
-        tickerLabel.setText(AppConstants.ticker);
-        industryLabel.setText(AppConstants.industry);
-        countryLabel.setText(AppConstants.country);
-        currencyLabel.setText(AppConstants.currency);
-        exchangeLabel.setText(AppConstants.exchange);
-        ipoDateLabel.setText(String.valueOf(AppConstants.ipoDate));
-        marketCapitalizationLabel.setText(String.valueOf(AppConstants.marketCapitalization));
+        nameLabel.setText(ViewStock.name);
+        tickerLabel.setText(ViewStock.ticker);
+        industryLabel.setText(ViewStock.industry);
+        countryLabel.setText(ViewStock.country);
+        currencyLabel.setText(ViewStock.currency);
+        exchangeLabel.setText(ViewStock.exchange);
+        ipoDateLabel.setText(String.valueOf(ViewStock.ipoDate));
+        marketCapitalizationLabel.setText(String.valueOf(ViewStock.marketCapitalization));
 
         //logoUrlLabel.setImage(AppConstants.logoUrl.getImage());
 
@@ -59,7 +65,7 @@ public class AssetInfo_Controller {
 
 
         // name이 있을 때만 항목에 보임
-        if (!AppConstants.name.isEmpty()) {
+        if (!stocks.isEmpty()) {
             nameLabel.setVisible(true);
             tickerLabel.setVisible(true);
             industryLabel.setVisible(true);

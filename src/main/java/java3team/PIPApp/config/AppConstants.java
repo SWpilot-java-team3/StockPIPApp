@@ -23,7 +23,7 @@ public final class AppConstants {
 
 
     ///  사용자 입력 변수
-    public static List<String> NameList = new ArrayList<>(); // 이름 목록
+///    public static List<String> NameList = new ArrayList<>(); // 이름 목록
 
     public static String name = "";      // 회사명
 
