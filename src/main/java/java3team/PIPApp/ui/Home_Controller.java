@@ -1,6 +1,6 @@
 package ui;
 
-import config.AppConstants;
+import config.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
+import java.util.LinkedList;
 import java.util.List;
 
 import javafx.stage.Stage;
@@ -30,36 +31,38 @@ public class Home_Controller {
 
     @FXML private Label warningMessageLabel; // 경고 메시지용
 
+    
 
-    /// API 연동 및 보완 필요 . 회사이름 -> 자동 완성 모듈. 회사 이름만 받아와서 리스트 형태로 담고 있음
-    @FXML
-    public void initialize() {
-        listViewId.getItems().addAll(AppConstants.NameList);    // 이름 리스트 불러오기
+//    /// API 연동 및 보완 필요 . 회사이름 -> 자동 완성 모듈. 회사 이름만 받아와서 리스트 형태로 담고 있음
+//    @FXML
+//    public void initialize() {
+//        listViewId.getItems().addAll(AppConstants.NameList);    // 이름 리스트 불러오기
+//
+//        List<String> companyNames = List.of("Apple", "Alphabet Inc.", "Amazon", "Adobe"); // 임시(테스트용)
+//        // nameField에 자동완성 붙이기
+//        TextFields.bindAutoCompletion(nameField, companyNames);
+//
+//
+//        // 저장된 값이 있다면 불러오기
+//        if (!AppConstants.name.isEmpty()) {
+//            nameField.setText(AppConstants.name);
+//            if (AppConstants.targetPrice != 0.0) {
+//                targetPriceField.setText(String.format("%.10f", AppConstants.targetPrice).replaceAll("\\.?0+$", ""));
+//            }
+//            if (AppConstants.stopPrice != 0.0) {
+//                stopPriceField.setText(String.format("%.10f", AppConstants.stopPrice).replaceAll("\\.?0+$", ""));
+//            }
+//            if (AppConstants.refreshMinute != 0) {
+//                refreshField_Minute.setText(String.valueOf(AppConstants.refreshMinute));
+//            }
+//            if (AppConstants.refreshSecond != 0) {
+//                refreshField_Second.setText(String.valueOf(AppConstants.refreshSecond));
+//            }
+//        }
+//    }
 
-        List<String> companyNames = List.of("Apple", "Alphabet Inc.", "Amazon", "Adobe"); // 임시(테스트용)
-        // nameField에 자동완성 붙이기
-        TextFields.bindAutoCompletion(nameField, companyNames);
-
-
-        // 저장된 값이 있다면 불러오기
-        if (!AppConstants.name.isEmpty()) {
-            nameField.setText(AppConstants.name);
-            if (AppConstants.targetPrice != 0.0) {
-                targetPriceField.setText(String.format("%.10f", AppConstants.targetPrice).replaceAll("\\.?0+$", ""));
-            }
-            if (AppConstants.stopPrice != 0.0) {
-                stopPriceField.setText(String.format("%.10f", AppConstants.stopPrice).replaceAll("\\.?0+$", ""));
-            }
-            if (AppConstants.refreshMinute != 0) {
-                refreshField_Minute.setText(String.valueOf(AppConstants.refreshMinute));
-            }
-            if (AppConstants.refreshSecond != 0) {
-                refreshField_Second.setText(String.valueOf(AppConstants.refreshSecond));
-            }
-        }
-    }
-
-
+    AppConstants stock = new AppConstants();
+    
     // 저장 버튼의 이벤트
     @FXML
     private void saveClick(ActionEvent event) {
@@ -85,19 +88,11 @@ public class Home_Controller {
 
 
         // 기존 코드 Clear
-        AppConstants.resetData();
-
-
-
-        // 이름 유효성 검사
-        ////(추가 필요)
-        AppConstants.name = name_Str;
-        /// 해당하는 이름의 회사가 존재하지 않으면 작업을 중단하는 예외처리 필요
-
+        stock.resetData();
 
         // 목표가 유효성 검사
         try {
-            AppConstants.targetPrice = Double.parseDouble(targetPriceStr);
+            stock.targetPrice = Double.parseDouble(targetPriceStr);
         } catch (NumberFormatException e) {
             warningMessageLabel.setVisible(true);
             warningMessageLabel.setText("목표가는 숫자 형식으로 입력해 주세요.");
@@ -107,7 +102,7 @@ public class Home_Controller {
 
         // 손절가 유효성 검사
         try {
-            AppConstants.stopPrice = Double.parseDouble(stopPriceStr);
+            stock.stopPrice = Double.parseDouble(stopPriceStr);
         } catch (NumberFormatException e) {
             warningMessageLabel.setVisible(true);
             warningMessageLabel.setText("손절가는 숫자 형식으로 입력해 주세요.");
@@ -118,7 +113,7 @@ public class Home_Controller {
         // 새로고침 주기-분은 입력된 경우에만 파싱 시도
         if (!refreshMinuteStr.isEmpty()) {
             try {
-                AppConstants.refreshMinute = Integer.parseInt(refreshMinuteStr);
+                stock.refreshMinute = Integer.parseInt(refreshMinuteStr);
             } catch (NumberFormatException e) {
                 warningMessageLabel.setVisible(true);
                 warningMessageLabel.setText("숫자(정수) 형식으로 입력해 주세요.");
@@ -129,7 +124,7 @@ public class Home_Controller {
         // 새로고침 주기-초는 입력된 경우에만 파싱 시도
         if (!refreshSecondStr.isEmpty()) {
             try {
-                AppConstants.refreshSecond = Integer.parseInt(refreshSecondStr);
+                stock.refreshSecond = Integer.parseInt(refreshSecondStr);
             } catch (NumberFormatException e) {
                 warningMessageLabel.setVisible(true);
                 warningMessageLabel.setText("숫자(정수) 형식으로 입력해 주세요.");
@@ -138,7 +133,7 @@ public class Home_Controller {
             }
         }
         // 새로고침 값이 0이면 유효성 처리
-        if ((AppConstants.refreshMinute + AppConstants.refreshSecond) == 0) {
+        if ((stock.refreshMinute + stock.refreshSecond) == 0) {
             warningMessageLabel.setVisible(true);
             warningMessageLabel.setText("새로고침 주기는 0이 될 수 없습니다.");
             System.out.println("⚠ 새로고침 주기는 0이 될 수 없음\n");
@@ -147,22 +142,22 @@ public class Home_Controller {
 
 
         // 최종 결과 출력
-        System.out.println("종목명: " + AppConstants.name);
-        System.out.println("목표가: " + AppConstants.targetPrice);
-        System.out.println("손절가: " + AppConstants.stopPrice);
-        System.out.println("새로고침: " + AppConstants.refreshMinute + "분 " + AppConstants.refreshSecond + "초");
+        System.out.println("종목명: " + stock.name);
+        System.out.println("목표가: " + stock.targetPrice);
+        System.out.println("손절가: " + stock.stopPrice);
+        System.out.println("새로고침: " + stock.refreshMinute + "분 " + stock.refreshSecond + "초");
         System.out.println();
 
 
         /// 이름 리스트
-        if (!AppConstants.NameList.contains(AppConstants.name)) {
-            AppConstants.NameList.add(AppConstants.name);
-            listViewId.getItems().add(AppConstants.name);
+        if (!stock.NameList.contains(stock.name)) {
+            stock.NameList.add(stock.name);
+            listViewId.getItems().add(stock.name);
         }
 
 
         // 저장완료 팝업
-        showAlert("StockPIP", "성공적으로 저장되었습니다!");
+        showAlert("stockPIP", "성공적으로 저장되었습니다!");
     }
     // 성공 팝업
     private void showAlert(String title, String message) {
@@ -187,8 +182,8 @@ public class Home_Controller {
         String currentName = nameField.getText().trim();
 
         // NameList와 ListView에서 해당 이름이 있을 때만 삭제
-        if (AppConstants.NameList.contains(currentName)) {
-            AppConstants.NameList.remove(currentName);
+        if (stock.NameList.contains(currentName)) {
+            stock.NameList.remove(currentName);
             listViewId.getItems().remove(currentName);
             System.out.println("입력된 이름 삭제됨: " + currentName);
         } else {
@@ -204,7 +199,7 @@ public class Home_Controller {
         refreshField_Second.clear();
 
         // 기존 코드 Clear
-        AppConstants.resetData();
+        stock.resetData();
 
         System.out.println("초기화됨\n\n");
     }
