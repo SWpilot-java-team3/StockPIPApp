@@ -3,7 +3,7 @@ package api.model;
 import com.google.gson.annotations.SerializedName;
 
 public class CompanyProfile {
-//
+///
     @SerializedName("name")
     private String name;
 
