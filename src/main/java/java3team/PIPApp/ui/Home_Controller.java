@@ -1,6 +1,7 @@
 package ui;
 
-import config.*;
+import config.StockLIst;
+import config.AppConstants;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -150,8 +151,8 @@ public class Home_Controller {
 
 
         /// 이름 리스트
-        if (!stock.NameList.contains(stock.name)) {
-            stock.NameList.add(stock.name);
+        if (!StockLIst.stocks.contains(stock.name)) {
+            StockLIst.stocks.add(stock);
             listViewId.getItems().add(stock.name);
         }
 

@@ -8,7 +8,7 @@ public class StockLIst {
     };
 
     ///  List 생성
-    List<AppConstants> stocks = new LinkedList<>();
+    public static List<AppConstants> stocks = new LinkedList<>();
 
 
 
