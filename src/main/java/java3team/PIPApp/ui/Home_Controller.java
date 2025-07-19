@@ -183,13 +183,13 @@ public class Home_Controller {
         String currentName = nameField.getText().trim();
 
         // NameList와 ListView에서 해당 이름이 있을 때만 삭제
-        if (stock.NameList.contains(currentName)) {
-            stock.NameList.remove(currentName);
-            listViewId.getItems().remove(currentName);
-            System.out.println("입력된 이름 삭제됨: " + currentName);
-        } else {
-            System.out.println("입력된 이름은 NameList에 존재하지 않음: " + currentName);
-        }
+//        if (stock.contains(currentName)) {
+//            stock.NameList.remove(currentName);
+//            listViewId.getItems().remove(currentName);
+//            System.out.println("입력된 이름 삭제됨: " + currentName);
+//        } else {
+//            System.out.println("입력된 이름은 NameList에 존재하지 않음: " + currentName);
+//        }
 
 
         // 사용자 입력 필드 초기화

@@ -14,6 +14,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 
+import static config.StockLIst.stocks;
+
 public class PriceInfo_Controller {
     @FXML private Label nameLabel;    // 티커
 
@@ -33,31 +35,35 @@ public class PriceInfo_Controller {
     @FXML
     public void initialize() {
         // ComboBox에 NameList 넣기 (이름 목록만 보여줌)
-        comboBoxID.getItems().setAll(AppConstants.NameList);
+        for(AppConstants stock : stocks){
+            comboBoxID.getItems().setAll(stock.name);
+            // 현재 선택된 name이 있다면 그것도 선택해줌 (선택 유지 목적)
+            if (stocks.contains(stock)) {
+                comboBoxID.setValue(stock.name);
+            }
 
-        // 현재 선택된 name이 있다면 그것도 선택해줌 (선택 유지 목적)
-        if (AppConstants.NameList.contains(AppConstants.name)) {
-            comboBoxID.setValue(AppConstants.name);
-        }
+    }
+        ///  나중에 버튼 클릭 이벤트 추가해야함
+        AppConstants ViewStock = stocks.get(stocks.indexOf(AppConstants.name));
 
 
 
         nameLabel.setText(AppConstants.name);
 
-        currentPriceLabel.setText(String.valueOf(AppConstants.currentPrice));
-        openPriceLabel.setText(String.valueOf(AppConstants.openPrice));
-        highPriceLabel.setText(String.valueOf(AppConstants.highPrice));
-        lowPriceLabel.setText(String.valueOf(AppConstants.lowPrice));
-        previousClosePriceLabel.setText(String.valueOf(AppConstants.previousClosePrice));
+        currentPriceLabel.setText(String.valueOf(ViewStock.currentPrice));
+        openPriceLabel.setText(String.valueOf(ViewStock.openPrice));
+        highPriceLabel.setText(String.valueOf(ViewStock.highPrice));
+        lowPriceLabel.setText(String.valueOf(ViewStock.lowPrice));
+        previousClosePriceLabel.setText(String.valueOf(ViewStock.previousClosePrice));
 
-        refreshTimeLabel.setText(String.valueOf(AppConstants.refreshTime));
+        refreshTimeLabel.setText(String.valueOf(ViewStock.refreshTime));
 
 
 
 
 
         // name이 있을 때만 항목에 보임
-        if (!AppConstants.name.isEmpty()) {
+        if (!stocks.isEmpty()) {
             nameLabel.setVisible(true);
             currentPriceLabel.setVisible(true);
             openPriceLabel.setVisible(true);
