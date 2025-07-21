@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
+// front 완성
 public class Main extends Application {
     public static Stage mainStage; //
 

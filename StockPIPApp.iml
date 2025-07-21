@@ -8,13 +8,20 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="charm-glisten-5.0.0" level="project" />
-    <orderEntry type="library" name="controlsfx-11.2.2" level="project" />
-    <orderEntry type="library" name="jfoenix-9.0.10" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../SettingWindow/lib/gson-2.10.1.jar!/" />
+          <root url="file://$MODULE_DIR$/../../../JavaFX/javafx-sdk-21.0.7/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../../../JavaFX/javafx-sdk-21.0.7/lib" recursive="false" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Downloads/jfoenix-9.0.10.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -23,7 +30,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../SettingWindow/lib/controlsfx-11.2.2.jar!/" />
+          <root url="jar://$USER_HOME$/Downloads/controlsfx-11.2.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -32,16 +39,20 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$USER_HOME$/문서/javafx-sdk-21.0.7/lib" />
+          <root url="jar://$USER_HOME$/Downloads/charm-glisten-5.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-        <jarDirectory url="file://$USER_HOME$/문서/javafx-sdk-21.0.7/lib" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="library" exported="" name="controlsfx-11.2.2" level="project" />
-    <orderEntry type="library" exported="" name="charm-glisten-5.0.0" level="project" />
-    <orderEntry type="library" exported="" name="gson-2.10.1" level="project" />
-    <orderEntry type="library" exported="" name="jfoenix-9.0.10" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Downloads/gson-2.10.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
