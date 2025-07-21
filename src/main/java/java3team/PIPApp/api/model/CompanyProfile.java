@@ -3,7 +3,7 @@ package api.model;
 import com.google.gson.annotations.SerializedName;
 
 public class CompanyProfile {
-///
+
     @SerializedName("name")
     private String name;
 
@@ -21,6 +21,18 @@ public class CompanyProfile {
 
     @SerializedName("logo")
     private String logoUrl;
+
+    @SerializedName("finnhubIndustry")
+    private String industry;
+
+    @SerializedName("currency")
+    private String currency;
+
+    @SerializedName("exchange")
+    private String exchange;
+
+    @SerializedName("marketCapitalization")
+    private double marketCapitalization;
 
     // Getters
     public String getName() {
@@ -45,6 +57,22 @@ public class CompanyProfile {
 
     public String getLogoUrl() {
         return logoUrl;
+    }
+
+    public String getIndustry() {
+        return industry;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public String getExchange() {
+        return exchange;
+    }
+
+    public double getMarketCapitalization() {
+        return marketCapitalization;
     }
 
     @Override

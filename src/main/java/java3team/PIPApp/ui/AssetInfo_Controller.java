@@ -14,8 +14,13 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import config.AppConstants;
+import api.model.CompanyProfile;
+import service.StockService;
+import java.time.LocalDate;
 
 public class AssetInfo_Controller {
+    private final StockService stockService = new StockService(); // 🔧 이 줄을 추가!
+
     @FXML private Label nameLabel;      // 회사명
     @FXML private Label tickerLabel;    // 티커
     @FXML private Label industryLabel;  // 산업군
@@ -28,63 +33,74 @@ public class AssetInfo_Controller {
     @FXML private ImageView logoUrlLabel;   // 로고 이미지
 
     @FXML private ComboBox<String> comboBoxID;  // 콤보박스
-
-
     /// API 연동 이후 빈칸 라벨에 셋
 
 
     @FXML
     public void initialize() {
         // ComboBox에 NameList 넣기 (이름 목록만 보여줌)
+        AppConstants.NameList.add("AAPL");
         comboBoxID.getItems().setAll(AppConstants.NameList);
+
+        comboBoxID.setOnAction(e -> handleComboBoxSelection());
 
         // 현재 선택된 name이 있다면 그것도 선택해줌 (선택 유지 목적)
         if (AppConstants.NameList.contains(AppConstants.name)) {
             comboBoxID.setValue(AppConstants.name);
+
+            handleComboBoxSelection();
         }
 
+    }
 
+    private void handleComboBoxSelection() {
+        String selectedTicker = comboBoxID.getValue();
+        if (selectedTicker != null && !selectedTicker.isEmpty()) {
+            CompanyProfile profile = stockService.getCompanyProfile(selectedTicker);
+            if (profile != null) {
+                AppConstants.name = profile.getName();
+                AppConstants.ticker = profile.getTicker();
+                AppConstants.industry = profile.getIndustry();
+                AppConstants.country = profile.getCountry();
+                AppConstants.currency = profile.getCurrency();
+                AppConstants.exchange = profile.getExchange();
+                AppConstants.ipoDate = LocalDate.parse(profile.getIpoDate());
+                AppConstants.marketCapitalization = profile.getMarketCapitalization();
+
+                // 이미지 로드 처리 예시 (비동기 로딩 권장, 현재 주석 처리)
+                // Image image = new Image(profile.getLogo(), true);
+                // logoUrlLabel.setImage(image);
+
+                updateLabels();
+            }
+        }
+    }
+
+    private void updateLabels() {
         nameLabel.setText(AppConstants.name);
         tickerLabel.setText(AppConstants.ticker);
         industryLabel.setText(AppConstants.industry);
         countryLabel.setText(AppConstants.country);
         currencyLabel.setText(AppConstants.currency);
         exchangeLabel.setText(AppConstants.exchange);
-        ipoDateLabel.setText(String.valueOf(AppConstants.ipoDate));
-        marketCapitalizationLabel.setText(String.valueOf(AppConstants.marketCapitalization));
+        ipoDateLabel.setText(AppConstants.ipoDate != null ? AppConstants.ipoDate.toString() : "");
+        marketCapitalizationLabel.setText(String.format("%.2f", AppConstants.marketCapitalization));
 
         //logoUrlLabel.setImage(AppConstants.logoUrl.getImage());
 
-
-
-
         // name이 있을 때만 항목에 보임
-        if (!AppConstants.name.isEmpty()) {
-            nameLabel.setVisible(true);
-            tickerLabel.setVisible(true);
-            industryLabel.setVisible(true);
-            countryLabel.setVisible(true);
-            currencyLabel.setVisible(true);
-            exchangeLabel.setVisible(true);
-            ipoDateLabel.setVisible(true);
-            marketCapitalizationLabel.setVisible(true);
+        boolean hasName = !AppConstants.name.isEmpty();
+        nameLabel.setVisible(hasName);
+        tickerLabel.setVisible(hasName);
+        industryLabel.setVisible(hasName);
+        countryLabel.setVisible(hasName);
+        currencyLabel.setVisible(hasName);
+        exchangeLabel.setVisible(hasName);
+        ipoDateLabel.setVisible(hasName);
+        marketCapitalizationLabel.setVisible(hasName);
 
-            //logoUrlLabel.setVisible(true);
-        } else {
-            nameLabel.setVisible(false);
-            tickerLabel.setVisible(false);
-            industryLabel.setVisible(false);
-            countryLabel.setVisible(false);
-            currencyLabel.setVisible(false);
-            exchangeLabel.setVisible(false);
-            ipoDateLabel.setVisible(false);
-            marketCapitalizationLabel.setVisible(false);
-
-            //logoUrlLabel.setVisible(false);
-        }
+        //logoUrlLabel.setVisible(hasName);
     }
-
-
 
 
 
