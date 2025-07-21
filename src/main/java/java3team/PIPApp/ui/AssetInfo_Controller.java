@@ -17,6 +17,7 @@ import config.AppConstants;
 import api.model.CompanyProfile;
 import service.StockService;
 import java.time.LocalDate;
+import service.CompanyListService;
 
 public class AssetInfo_Controller {
     private final StockService stockService = new StockService(); // 🔧 이 줄을 추가!
@@ -39,18 +40,21 @@ public class AssetInfo_Controller {
     @FXML
     public void initialize() {
         // ComboBox에 NameList 넣기 (이름 목록만 보여줌)
-        AppConstants.NameList.add("AAPL");
-        comboBoxID.getItems().setAll(AppConstants.NameList);
-
-        comboBoxID.setOnAction(e -> handleComboBoxSelection());
-
-        // 현재 선택된 name이 있다면 그것도 선택해줌 (선택 유지 목적)
-        if (AppConstants.NameList.contains(AppConstants.name)) {
-            comboBoxID.setValue(AppConstants.name);
-
-            handleComboBoxSelection();
+        if (AppConstants.NameList.isEmpty()) {
+            CompanyListService companyListService = new CompanyListService();
+            AppConstants.NameList = companyListService.fetchTickerSymbols(50);
         }
 
+        // 항상 콤보박스에는 리스트 세팅
+        comboBoxID.getItems().setAll(AppConstants.NameList);
+
+        if (AppConstants.NameList.contains(AppConstants.name)) {
+            comboBoxID.setValue(AppConstants.name);
+            handleComboBoxSelection(); // AssetInfo의 경우
+            // 또는 updateStockQuote(); // PriceInfo의 경우
+        }
+
+        comboBoxID.setOnAction(e -> handleComboBoxSelection());
     }
 
     private void handleComboBoxSelection() {

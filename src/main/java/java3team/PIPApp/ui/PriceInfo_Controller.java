@@ -63,7 +63,7 @@ public class PriceInfo_Controller {
         }
 
         // 5초마다 주기적으로 업데이트
-        refreshTimeline = new Timeline(
+        refreshTimeline = new Timeline( //업데이트 주기(main에서 받아오는 로직 추가 필요)
                 new KeyFrame(Duration.seconds(5), e -> updateStockQuote())
         );
         refreshTimeline.setCycleCount(Timeline.INDEFINITE);
