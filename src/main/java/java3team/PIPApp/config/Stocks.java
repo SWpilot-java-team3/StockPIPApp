@@ -102,4 +102,10 @@ public class Stocks {
     public int getRefreshSecond() {
         return refreshSecond;
     }
+
+    public double getOpenPrice(){return openPrice;}
+    public double getHighPrice(){return highPrice;}
+    public double getLowPrice(){return lowPrice;}
+    public double getPreviousClosePrice(){return previousClosePrice;}
+    public LocalDateTime getApi_refreshTime(){return api_refreshTime;}
 }

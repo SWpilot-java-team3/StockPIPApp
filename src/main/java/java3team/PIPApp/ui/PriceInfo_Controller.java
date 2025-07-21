@@ -12,15 +12,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import service.StockService;
-import api.model.StockQuote;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PriceInfo_Controller {
     private final StockService stockService = new StockService(); // 주가 API
@@ -46,7 +45,7 @@ public class PriceInfo_Controller {
         for (Stocks stock : StockList.getStockArray()) {
             comboBoxID.getItems().add(stock.getName());
         }
-
+        Stocks quote = null;
         // 콤보박스 선택 이벤트 핸들러
         comboBoxID.setOnAction(e -> {
             String selectedName = comboBoxID.getValue();
@@ -60,18 +59,18 @@ public class PriceInfo_Controller {
                 }
             }
         });
-        StockQuote quote = stockService.getLiveStockQuote(AppConstants.name);
-        if (quote == null) {
+
+        if (quote.get() == null) {
             System.out.println("시세 정보를 불러오지 못했습니다.");
             return;
         }
 
-        AppConstants.currentPrice = quote.getCurrentPrice();
-        AppConstants.openPrice = quote.getOpenPrice();
-        AppConstants.highPrice = quote.getHighPrice();
-        AppConstants.lowPrice = quote.getLowPrice();
-        AppConstants.previousClosePrice = quote.getPreviousClosePrice();
-        AppConstants.refreshTime = LocalDateTime.now();
+        quote.currentPrice = quote.get().getCurrentPrice();
+        quote.openPrice = quote.get().getOpenPrice();
+        quote.highPrice = quote.get().getHighPrice();
+        quote.lowPrice = quote.get().getLowPrice();
+        quote.previousClosePrice = quote.get().getPreviousClosePrice();
+        quote.refreshTime = LocalDateTime.now();
 
         // 초기 값 설정 (있다면)
         if (!StockList.getStockArray().isEmpty()) {

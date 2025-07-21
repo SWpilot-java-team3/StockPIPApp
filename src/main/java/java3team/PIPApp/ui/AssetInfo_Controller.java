@@ -16,65 +16,15 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
-import config.AppConstants;
+import config.*;
 import api.model.CompanyProfile;
 import service.StockService;
 import java.time.LocalDate;
 import service.CompanyListService;
 
-public class AssetInfo_Controller {
-    private final StockService stockService = new StockService(); // 🔧 이 줄을 추가!
+// 라벨 업데이트
+public class AssetInfo_Controller{
 
-    @FXML private Label nameLabel;      // 회사명
-    @FXML private Label tickerLabel;    // 티커
-    @FXML private Label industryLabel;  // 산업군
-    @FXML private Label countryLabel;   // 국가
-    @FXML private Label currencyLabel;  // 통화
-    @FXML private Label exchangeLabel;  // 거래소
-    @FXML private Label ipoDateLabel;   // IPO일
-    @FXML private Label marketCapitalizationLabel;  // 시가총액
-
-    @FXML private ImageView logoUrlLabel;   // 로고 이미지
-
-    @FXML private ComboBox<String> comboBoxID;  // 콤보박스
-
-
-    /// API 연동 이후 빈칸 라벨에 셋
-
-
-    @FXML
-    public void initialize() {
-        // 콤보박스 초기화
-        comboBoxID.getItems().clear();
-        for (Stocks stock : StockList.getStockArray()) {
-            comboBoxID.getItems().add(stock.getName());
-        }
-
-        comboBoxID.setOnAction(e -> handleComboBoxSelection());
-    }
-
-        // 콤보박스 선택 이벤트 핸들러
-        comboBoxID.setOnAction(e -> {
-            String selectedName = comboBoxID.getValue();
-            if (selectedName == null) return;
-
-            for (Stocks stock : StockList.getStockArray()) {
-                if (stock.getName().equals(selectedName)) {
-                    updateLabel(stock);
-                    break;
-                }
-            }
-        });
-
-        // 초기 값 설정 (있다면)
-        if (!StockList.getStockArray().isEmpty()) {
-            Stocks firstStock = StockList.getStockArray().get(0);
-            comboBoxID.getSelectionModel().select(firstStock.getName());
-            updateLabel(firstStock);
-        }
-    }
-
-    // 라벨 업데이트
     private void updateLabel(Stocks stock) {
         nameLabel.setText(stock.getName());
         tickerLabel.setText(String.valueOf(stock.ticker));
@@ -87,11 +37,6 @@ public class AssetInfo_Controller {
 
         //logoUrlLabel.setImage(stock.logoUrl.getImage());
     }
-
-
-
-
-
 
     /// 사이드바 함수 ///
     // PIP 활성화
