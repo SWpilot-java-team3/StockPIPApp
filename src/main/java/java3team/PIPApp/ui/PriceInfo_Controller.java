@@ -14,13 +14,18 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import service.StockService;
+import api.model.StockQuote;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDateTime;
 
 public class PriceInfo_Controller {
-    @FXML private Label nameLabel;    // 회사명
+    private final StockService stockService = new StockService(); // 주가 API
+    @FXML private Label nameLabel;    // 티커
+
     @FXML private Label currentPriceLabel;  // 현재가
     @FXML private Label openPriceLabel;     // 시가
     @FXML private Label highPriceLabel;     // 당일 최고가
@@ -55,6 +60,18 @@ public class PriceInfo_Controller {
                 }
             }
         });
+        StockQuote quote = stockService.getLiveStockQuote(AppConstants.name);
+        if (quote == null) {
+            System.out.println("시세 정보를 불러오지 못했습니다.");
+            return;
+        }
+
+        AppConstants.currentPrice = quote.getCurrentPrice();
+        AppConstants.openPrice = quote.getOpenPrice();
+        AppConstants.highPrice = quote.getHighPrice();
+        AppConstants.lowPrice = quote.getLowPrice();
+        AppConstants.previousClosePrice = quote.getPreviousClosePrice();
+        AppConstants.refreshTime = LocalDateTime.now();
 
         // 초기 값 설정 (있다면)
         if (!StockList.getStockArray().isEmpty()) {
@@ -101,6 +118,8 @@ public class PriceInfo_Controller {
 
 
 
+
+
     /// 사이드바 함수 ///
     // PIP 활성화
     @FXML
@@ -128,9 +147,6 @@ public class PriceInfo_Controller {
         }
     }
 
-
-
-    // 홈으로 이동
     @FXML
     private void handleHomeClick(MouseEvent event) {
         System.out.println("홈 클릭됨");
@@ -138,18 +154,14 @@ public class PriceInfo_Controller {
             refreshTimeline.stop();
         }
         try {
-            // 홈.fxml 로드
             FXMLLoader loader = new FXMLLoader(getClass().getResource("home.fxml"));
             Parent root = loader.load();
-
-            // Main의 전역 Stage를 이용해서 화면 전환
             Main.mainStage.getScene().setRoot(root);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // 종목 정보로 이동
     @FXML
     private void handleAssetInfoClick(MouseEvent event) {
         System.out.println("종목 정보 클릭됨");
@@ -157,22 +169,19 @@ public class PriceInfo_Controller {
             refreshTimeline.stop();
         }
         try {
-            // 종목 정보.fxml 로드
             FXMLLoader loader = new FXMLLoader(getClass().getResource("assetInfo.fxml"));
             Parent root = loader.load();
-
-            // Main의 전역 Stage를 이용해서 화면 전환
             Main.mainStage.getScene().setRoot(root);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // 시세 정보로 이동
     @FXML
-    private void handlePriceInfoClick(MouseEvent event) { System.out.println("시세 정보 클릭됨"); }
+    private void handlePriceInfoClick(MouseEvent event) {
+        System.out.println("시세 정보 클릭됨");
+    }
 
-    // 설정으로 이동
     @FXML
     private void handleSettingsClick(MouseEvent event) {
         System.out.println("설정 클릭됨");
@@ -180,22 +189,17 @@ public class PriceInfo_Controller {
             refreshTimeline.stop();
         }
         try {
-            // 홈.fxml 로드
             FXMLLoader loader = new FXMLLoader(getClass().getResource("settings.fxml"));
             Parent root = loader.load();
-
-            // Main의 전역 Stage를 이용해서 화면 전환
             Main.mainStage.getScene().setRoot(root);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // 외부 사이트로 이동
     @FXML
     private void handleExternalClick(MouseEvent event) {
         System.out.println("외부 사이트 클릭됨");
-
         try {
             Desktop.getDesktop().browse(new URI("https://finnhub.io/"));
         } catch (Exception e) {

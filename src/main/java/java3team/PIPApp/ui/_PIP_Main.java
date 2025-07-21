@@ -17,14 +17,17 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
 import java.util.concurrent.atomic.AtomicInteger;
+import service.StockService;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class _PIP_Main {
 
     private static final AtomicInteger openWindowCount = new AtomicInteger(0);  // 열린 창 수 추적
     private double offsetX, offsetY;
     private final int RESIZE_MARGIN = 10;
+    private final StockService stockService = new StockService();
 
     public void pip_On(Stage stage, Stocks stock, int index) {
         openWindowCount.incrementAndGet();
@@ -35,6 +38,24 @@ public class _PIP_Main {
 
         double fontSize = _PIP_SettingsFontSize.getFontSize();
         nameLabel.setStyle("-fx-font-size: " + (fontSize * 0.7) + "px; -fx-text-fill: white;");
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                // 여기에 실시간 주가 요청
+                api.model.StockQuote quote = stockService.getLiveStockQuote("AAPL");
+                if (quote != null) {
+                    double price = quote.getCurrentPrice();
+
+                    // JavaFX UI 쓰레드에서 업데이트
+                    javafx.application.Platform.runLater(() -> {
+                        priceLabel.setText("₩ " + String.format("%,.2f", price));
+                    });
+                }
+            }
+        }, 0, 5000); // 0ms 후 시작, 5000ms(=5초) 간격
+
+        double fontSize = _PIP_SettingsFontSize.getFontSize();  // 저장된 크기 불러오기
         priceLabel.setStyle("-fx-font-size: " + fontSize + "px; -fx-text-fill: red;");
 
         // 창 크기 계산

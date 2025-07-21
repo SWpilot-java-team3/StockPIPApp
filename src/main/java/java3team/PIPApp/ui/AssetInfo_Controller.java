@@ -16,8 +16,15 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
+import config.AppConstants;
+import api.model.CompanyProfile;
+import service.StockService;
+import java.time.LocalDate;
+import service.CompanyListService;
 
 public class AssetInfo_Controller {
+    private final StockService stockService = new StockService(); // 🔧 이 줄을 추가!
+
     @FXML private Label nameLabel;      // 회사명
     @FXML private Label tickerLabel;    // 티커
     @FXML private Label industryLabel;  // 산업군
@@ -32,6 +39,9 @@ public class AssetInfo_Controller {
     @FXML private ComboBox<String> comboBoxID;  // 콤보박스
 
 
+    /// API 연동 이후 빈칸 라벨에 셋
+
+
     @FXML
     public void initialize() {
         // 콤보박스 초기화
@@ -39,6 +49,9 @@ public class AssetInfo_Controller {
         for (Stocks stock : StockList.getStockArray()) {
             comboBoxID.getItems().add(stock.getName());
         }
+
+        comboBoxID.setOnAction(e -> handleComboBoxSelection());
+    }
 
         // 콤보박스 선택 이벤트 핸들러
         comboBoxID.setOnAction(e -> {
