@@ -3,6 +3,7 @@ package api.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import api.model.CompanyProfile;
+import config.AppConstants;
 
 import java.net.URI;
 import java.net.http.*;
@@ -51,21 +52,22 @@ public class FinnhubApiClient {
             return Optional.empty();
         }
     }
+    public Optional<CompanyProfile> fetchCompanyProfile(String symbol) {
+        String url = AppConstants.API_BASE_URL + "/stock/profile2?symbol=" + symbol + "&token=" + AppConstants.API_KEY;
 
-    public Optional<CompanyProfile> getCompanyProfile(String symbol) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/stock/profile2?symbol=" + symbol + "&token=" + API_KEY))
+                    .uri(URI.create(url))
                     .GET()
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             CompanyProfile profile = gson.fromJson(response.body(), CompanyProfile.class);
             return Optional.ofNullable(profile);
-
         } catch (IOException | InterruptedException | JsonSyntaxException e) {
             e.printStackTrace();
             return Optional.empty();
         }
     }
+
 }

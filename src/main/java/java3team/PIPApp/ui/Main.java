@@ -9,6 +9,8 @@ import javafx.stage.Stage;
 
 import api.model.FinnhubApiClient;
 import api.model.StockQuote;
+import api.model.CompanyProfile;
+import service.StockService;
 
 public class Main extends Application {
     public static Stage mainStage; //
@@ -42,6 +44,19 @@ public class Main extends Application {
             System.out.println("전일 종가: " + quote.getPreviousClosePrice());
         } else {
             System.out.println("데이터를 가져올 수 없습니다.");
+        }
+
+        // ✅ 회사 정보 출력 추가
+        CompanyProfile profile = client.fetchCompanyProfile(symbol).orElse(null);
+        if (profile != null) {
+            System.out.println("\n🏢 " + symbol + " 회사 정보:");
+            System.out.println("회사명: " + profile.getName());
+            System.out.println("국가: " + profile.getCountry());
+            System.out.println("상장일: " + profile.getIpoDate());
+            System.out.println("웹사이트: " + profile.getWebsite());
+            System.out.println("로고 URL: " + profile.getLogoUrl());
+        } else {
+            System.out.println("회사 정보를 가져올 수 없습니다.");
         }
     }
 }
