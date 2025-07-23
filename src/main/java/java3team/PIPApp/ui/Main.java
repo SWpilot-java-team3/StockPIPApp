@@ -41,7 +41,7 @@ public class Main extends Application {
         primaryStage.show();
 
 
-
+// 마지막 단계
 //        // ⭐ 알림 체크 스케줄링
 //        alertService = new AlertService();
 //
