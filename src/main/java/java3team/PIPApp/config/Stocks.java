@@ -37,6 +37,18 @@ public class Stocks {
     public double previousClosePrice;      // 전일 종가
     public LocalDateTime api_refreshTime;   // 최근 갱신 시간
 
+    // ⭐조건 감지 알림을 위해 필요한 변수 추가 AlertState Enum 정의
+    public enum AlertState {
+        NONE,           // 알림 조건 외 (초기 상태 또는 조건 범위를 벗어났을 때)
+        ABOVE_TARGET,   // 목표가 이상 조건 만족
+        BELOW_STOP      // 손절가 이하 조건 만족
+    }
+
+
+    // 현재 알림 상태를 저장하는 변수
+    // transient 키워드를 사용하여 이 필드가 JSON 파일에 저장되지 않도록
+    private transient AlertState currentAlertState = Stocks.AlertState.NONE;
+
 
     public Stocks(String ticker, double targetPrice, double stopPrice, int refreshMinute, int refreshSecond) {
         this.ticker = ticker;
@@ -98,6 +110,16 @@ public class Stocks {
         }
     }
 
+    // currentAlertState Getter/Setter
+    public AlertState getCurrentAlertState() {
+        return currentAlertState;
+    }
+
+    public void setCurrentAlertState(AlertState currentAlertState) {
+        this.currentAlertState = currentAlertState;
+    }
+
+
     public void refreshQuote() {
         StockService stockService = new StockService();
         var quote = stockService.getLiveStockQuote(this.ticker);
@@ -129,10 +151,23 @@ public class Stocks {
 
 
     public double getTargetPrice() { return targetPrice; }
-    public void setTargetPrice(double targetPrice) { this.targetPrice = targetPrice; }
+
+    public void setTargetPrice(double targetPrice) {
+        if (this.targetPrice != targetPrice) {
+            this.targetPrice = targetPrice;
+            this.currentAlertState = Stocks.AlertState.NONE; // 목표가 변경 시 알림 상태 초기화
+        }
+    }
+
 
     public double getStopPrice() { return stopPrice; }
-    public void setStopPrice(double stopPrice) { this.stopPrice = stopPrice; }
+
+    public void setStopPrice(double stopPrice) {
+        if (this.stopPrice != stopPrice) {
+            this.stopPrice = stopPrice;
+            this.currentAlertState = Stocks.AlertState.NONE; // 손절가 변경 시 알림 상태 초기화
+        }
+    }
 
     public int getRefresh() { return refresh; }
     public void setRefresh(int refresh) { this.refresh = refresh; }

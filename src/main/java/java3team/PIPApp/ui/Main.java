@@ -41,32 +41,31 @@ public class Main extends Application {
         primaryStage.show();
 
 
-// 마지막 단계
-//        // ⭐ 알림 체크 스케줄링
-//        alertService = new AlertService();
-//
-//        dataUpdateTimeline = new Timeline(
-//                new KeyFrame(Duration.seconds(5), event -> {
-//                    System.out.println("⏰ 알림 체크 실행 중...");
-//                    alertService.checkPriceAndAlert();
-//                })
-//        );
-//        dataUpdateTimeline.setCycleCount(Timeline.INDEFINITE);
-//        dataUpdateTimeline.play();
+        // ⭐ 알림 체크 스케줄링
+        alertService = new AlertService();
+
+        dataUpdateTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(5), event -> {
+                    System.out.println("⏰ 알림 체크 실행 중...");
+                    alertService.checkPriceAndAlert();
+                })
+        );
+        dataUpdateTimeline.setCycleCount(Timeline.INDEFINITE);
+        dataUpdateTimeline.play();
     }
 
-//    @Override
-//    public void stop() throws Exception {
-//        if (dataUpdateTimeline != null) {
-//            dataUpdateTimeline.stop();
-//            System.out.println("데이터 갱신 Timeline이 중지되었습니다.");
-//        }
-//
-//        preferencesManager.saveSettings();
-//        System.out.println("현재 주식 종목 설정이 JSON 파일에 저장되었습니다.");
-//
-//        super.stop();
-//    }
+    @Override
+    public void stop() throws Exception {
+        if (dataUpdateTimeline != null) {
+            dataUpdateTimeline.stop();
+            System.out.println("데이터 갱신 Timeline이 중지되었습니다.");
+        }
+
+        preferencesManager.saveSettings();
+        System.out.println("현재 주식 종목 설정이 JSON 파일에 저장되었습니다.");
+
+        super.stop();
+    }
 
     public static void main(String[] args) { launch(args); }
 }

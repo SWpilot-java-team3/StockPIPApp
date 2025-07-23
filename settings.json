@@ -1,0 +1,17 @@
+[
+  {
+    "ticker": "AAPL",
+    "name": "Apple Inc",
+    "targetPrice": 210.0,
+    "stopPrice": 200.0,
+    "refresh": 5,
+    "refreshMinute": 0,
+    "refreshSecond": 5,
+    "industry": "Technology",
+    "country": "US",
+    "currency": "USD",
+    "exchange": "NASDAQ NMS - GLOBAL MARKET",
+    "ipoDate": "1980-12-12",
+    "marketCapitalization": 3202241.040089
+  }
+]

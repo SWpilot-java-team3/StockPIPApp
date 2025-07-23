@@ -11,26 +11,16 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../../../JavaFX/javafx-sdk-21.0.7/lib" />
+          <root url="jar://$USER_HOME$/Downloads/controlsfx-11.2.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/../../../JavaFX/javafx-sdk-21.0.7/lib" recursive="false" />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$USER_HOME$/Downloads/jfoenix-9.0.10.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/Downloads/controlsfx-11.2.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -52,6 +42,16 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://C:/Program Files/Java/javafx-sdk-21.0.7/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://C:/Program Files/Java/javafx-sdk-21.0.7/lib" recursive="false" />
       </library>
     </orderEntry>
   </component>

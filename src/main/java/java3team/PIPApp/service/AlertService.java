@@ -1,83 +1,163 @@
 package service;
 
 import config.*;
-import javafx.animation.PauseTransition; // ⭐ PauseTransition 임포트 추가
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.stage.Screen; // ⭐ Screen 임포트 추가
-import javafx.stage.Stage; // ⭐ Stage 임포트 추가
-import javafx.util.Duration; // ⭐ Duration 임포트 추가
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
+import javafx.geometry.Pos;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
-import java.util.List; // List 인터페이스 임포트
-
+import java.util.List;
 
 public class AlertService {
 
     public static void checkPriceAndAlert() {
-
-        // StockList에서 모든 Stocks 객체를 가져오기.
         List<Stocks> stocksToMonitor = StockList.getStockArray();
 
-        // 각 종목에 대해 알림 조건을 확인합니다.
         for (Stocks stock : stocksToMonitor) {
+            stock.refreshQuote();
+
             double currentPrice = stock.getCurrentPrice();
             double targetPrice = stock.getTargetPrice();
             double stopPrice = stock.getStopPrice();
             String companyName = stock.getName();
 
-            // API로부터 실제 currentPrice를 받아오는 로직이 필요합니다.
-            // 현재 stock.getCurrentPrice()는 초기값일 수 있으므로, 실제 시세 업데이트 로직이 필요합니다.
-            // 예를 들어, StockService를 통해 API 호출 후 currentPrice를 업데이트하는 로직이 여기에 들어가야 합니다.
-            // 예시: stock.setCurrentPrice(new StockService().getLiveStockQuote(stock.getTicker()).getC());
+            Stocks.AlertState previousAlertState = stock.getCurrentAlertState();
+            Stocks.AlertState newAlertState = Stocks.AlertState.NONE;
+            boolean shouldSendAlert = false;
+            String title = "";
 
-            if (currentPrice >= targetPrice && targetPrice != 0.0) {
-                sendAlert(companyName + " 목표가 도달!", "현재가: " + currentPrice + ", 목표가: " + targetPrice);
-            } else if (currentPrice <= stopPrice && stopPrice != 0.0) {
-                sendAlert(companyName + " 손절가 도달!", "현재가: " + currentPrice + ", 손절가: " + stopPrice);
+            if (targetPrice != 0.0 && currentPrice >= targetPrice) {
+                newAlertState = Stocks.AlertState.ABOVE_TARGET;
+                if (previousAlertState != Stocks.AlertState.ABOVE_TARGET) {
+                    shouldSendAlert = true;
+                    title = companyName + " 목표가 도달!";
+                }
+            } else if (stopPrice != 0.0 && currentPrice <= stopPrice) {
+                newAlertState = Stocks.AlertState.BELOW_STOP;
+                if (previousAlertState != Stocks.AlertState.BELOW_STOP) {
+                    shouldSendAlert = true;
+                    title = companyName + " 손절가 도달!";
+                }
+            } else {
+                newAlertState = Stocks.AlertState.NONE;
+            }
+
+            stock.setCurrentAlertState(newAlertState);
+
+            if (shouldSendAlert) {
+                sendAlert(title, currentPrice, targetPrice, stopPrice, newAlertState);
             }
         }
     }
 
-    private static void sendAlert(String title, String message) {
+    private static void sendAlert(String title, double currentPrice, double targetPrice, double stopPrice, Stocks.AlertState alertType) {
         Platform.runLater(() -> {
-            showAlertPopup(title, message);
+            showAlertPopup(title, currentPrice, targetPrice, stopPrice, alertType);
         });
     }
 
-    private static void showAlertPopup(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
+    private static void showAlertPopup(String title, double currentPrice, double targetPrice, double stopPrice, Stocks.AlertState alertType) {
+        Stage popupStage = new Stage();
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setAlwaysOnTop(true);
 
-        // ⭐ 팝업을 띄울 Stage를 가져옵니다.
-        // Alert는 Stage를 상속받지 않으므로, getDialogPane().getScene().getWindow()를 통해 접근합니다.
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        StackPane root = new StackPane();
+        root.setStyle(
+                "-fx-background-color: rgba(0,0,0,0.3);" +
+                        "-fx-border-color: white;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-background-radius: 5;" +
+                        "-fx-border-radius: 5;"
+        );
+        root.setPrefSize(300, 100);
+        root.setAlignment(Pos.CENTER);
 
-        // ⭐ 화면 오른쪽 아래에 위치 설정
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+
+        TextFlow messageTextFlow = new TextFlow();
+        messageTextFlow.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+
+        // "현재가: " 부분 (흰색)
+        Text currentPriceStaticText = new Text("현재가: ");
+        currentPriceStaticText.setStyle("-fx-fill: white; -fx-font-size: 14px;");
+
+        // 현재가 값 (빨간색)
+        Text currentPriceValueText = new Text(String.format("%,.2f", currentPrice));
+        currentPriceValueText.setStyle("-fx-fill: red; -fx-font-size: 14px;");
+
+        // 구분자 (흰색)
+        Text separatorText = new Text(", ");
+        separatorText.setStyle("-fx-fill: white; -fx-font-size: 14px;");
+
+        // 목표가/손절가 부분
+        Text targetOrStopPriceStaticText;
+        Text targetOrStopPriceValueText;
+
+        if (alertType == Stocks.AlertState.ABOVE_TARGET) {
+            targetOrStopPriceStaticText = new Text("목표가: ");
+            targetOrStopPriceStaticText.setStyle("-fx-fill: white; -fx-font-size: 14px;");
+
+            // 목표가 값 (파란색)
+            targetOrStopPriceValueText = new Text(String.format("%,.2f", targetPrice));
+            targetOrStopPriceValueText.setStyle("-fx-fill: blue; -fx-font-size: 14px;");
+
+        } else { // Stocks.AlertState.BELOW_STOP (손절가)
+            targetOrStopPriceStaticText = new Text("손절가: ");
+            targetOrStopPriceStaticText.setStyle("-fx-fill: white; -fx-font-size: 14px;");
+
+            // 손절가 값 (파란색으)
+            targetOrStopPriceValueText = new Text(String.format("%,.2f", stopPrice));
+            targetOrStopPriceValueText.setStyle("-fx-fill: blue; -fx-font-size: 14px;");
+        }
+
+        messageTextFlow.getChildren().addAll(
+                currentPriceStaticText,
+                currentPriceValueText,
+                separatorText,
+                targetOrStopPriceStaticText,
+                targetOrStopPriceValueText
+        );
+
+        VBox contentBox = new VBox(5);
+        contentBox.setAlignment(Pos.CENTER);
+        contentBox.getChildren().addAll(titleLabel, messageTextFlow);
+
+        root.getChildren().add(contentBox);
+
+        Scene scene = new Scene(root);
+        scene.setFill(null);
+
+        popupStage.setScene(scene);
+
         double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
         double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
 
-        // 팝업 창의 대략적인 크기를 고려하여 위치 조정 (정확한 크기는 런타임에 결정되므로 대략적인 값 사용)
-        // 예를 들어, 너비 300px, 높이 150px 정도로 가정
-        double alertWidth = 300;
-        double alertHeight = 150;
+        double popupWidth = root.getPrefWidth();
+        double popupHeight = root.getPrefHeight();
 
-        stage.setX(screenWidth - alertWidth - 20); // 화면 오른쪽에서 20px 안쪽
-        stage.setY(screenHeight - alertHeight - 20); // 화면 아래에서 20px 안쪽
+        popupStage.setX(screenWidth - popupWidth - 20);
+        popupStage.setY(screenHeight - popupHeight - 20);
 
-        // 🔔 내장 비프음 (설정에서 켜져있을 때만)
         if (AppConstants.AlertSound) {
             java.awt.Toolkit.getDefaultToolkit().beep();
         }
 
-        // ⭐ 2초 뒤에 팝업이 자동으로 사라지도록 설정
         PauseTransition delay = new PauseTransition(Duration.seconds(2));
         delay.setOnFinished(event -> {
-            alert.hide(); // 팝업 숨기기 (닫기)
+            popupStage.hide();
         });
 
-        alert.show(); // 팝업 표시
-        delay.play(); // 딜레이 시작
+        popupStage.show();
+        delay.play();
     }
 }
