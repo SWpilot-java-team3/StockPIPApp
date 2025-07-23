@@ -2,6 +2,12 @@ package ui;
 
 import config.AppConstants;
 import config.Stocks;
+import api.model.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.fxml.FXML;
+import javafx.util.Duration;
+import service.*;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -18,6 +24,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class _PIP_Main {
@@ -26,21 +34,54 @@ public class _PIP_Main {
     private double offsetX, offsetY;
     private final int RESIZE_MARGIN = 10;
 
+    private Timeline refreshTimeline;  // 주기적 업데이트용 타임라인
+    private double previousPrice = -1;  // 직전 값
+
+    // 종목명 + 현재가 표시
+    private Label nameLabel;
+    private Label priceLabel;
+
     public void pip_On(Stage stage, Stocks stock, int index) {
         openWindowCount.incrementAndGet();
 
         // 종목명 + 현재가 표시
-        Label nameLabel = new Label(stock.getName());
-        Label priceLabel = new Label("$ " + stock.currentPrice);
+        nameLabel = new Label(stock.getTicker() + "(" + stock.getName() + ")");
+        priceLabel = new Label("Loading...");
+
+//        // 실시간 주가 갱신 타이머
+//        Timer timer = new Timer(true); // 데몬 스레드
+//        timer.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                StockQuote quote = new StockService().getLiveStockQuote(stock.getTicker());
+//                if (quote != null) {
+//                    double price = quote.getCurrentPrice();
+//                    Platform.runLater(() -> {
+//                        priceLabel.setText("$ " + String.format("%,.2f", price));
+//                        System.out.println("🔄 [" + stock.getTicker() + "] PIP 정보 자동 새로고침");
+//                    });
+//                }
+//            }
+//        }, 0, stock.getRefresh() * 1000); // 설정된 초 단위로 갱신
+
 
         double fontSize = _PIP_SettingsFontSize.getFontSize();
-        nameLabel.setStyle("-fx-font-size: " + (fontSize * 0.7) + "px; -fx-text-fill: white;");
-        priceLabel.setStyle("-fx-font-size: " + fontSize + "px; -fx-text-fill: red;");
+        nameLabel.setStyle("-fx-font-size: " + (fontSize * 0.65) + "px; -fx-text-fill: white;" +
+                "-fx-effect: dropshadow(gaussian, black, 2, 0.3, 0, 0);");
+        priceLabel.setStyle("-fx-font-size: " + fontSize + "px; -fx-text-fill: lightgray;" +
+                "-fx-effect: dropshadow(gaussian, black, 2, 0.3, 0, 0);");
+
+        // 타임라인 시작
+        updateLabels(stock);
+        timelineRefresh(stock);
 
         // 창 크기 계산
         double ratio = fontSize / 28.0;
         double newWidth = Math.max(300, 300 * ratio);
         double newHeight = Math.max(120, 120 * ratio);
+
+        stage.setX(0);
+        stage.setY(0 + (fontSize * 5) * index); // Y좌표도 같이 늘림
 
         // 버튼
         Button closeBtn = new Button("✕");
@@ -48,6 +89,10 @@ public class _PIP_Main {
         closeBtn.setOnAction(e -> {
             stage.close();
             int remaining = openWindowCount.decrementAndGet();
+            // 타임라인 정지
+            if (refreshTimeline != null) {
+                refreshTimeline.stop();
+            }
             if (remaining == 0) {
                 Platform.exit();  // 마지막 창 닫으면 종료
             }
@@ -58,6 +103,10 @@ public class _PIP_Main {
         settingsBtn.setOnAction(e -> {
             stage.close();
             openWindowCount.decrementAndGet();
+            // 타임라인 정지
+            if (refreshTimeline != null) {
+                refreshTimeline.stop();
+            }
             try {
                 Parent homeRoot = FXMLLoader.load(getClass().getResource("home.fxml"));
                 Main.mainStage.setScene(new Scene(homeRoot, 1220, 740));
@@ -102,6 +151,50 @@ public class _PIP_Main {
         stage.setScene(scene);
         stage.setTitle("StockPipApp");
         stage.show();
+    }
+
+    private void timelineRefresh(Stocks stock) {
+        if (refreshTimeline != null) {
+            refreshTimeline.stop();
+        }
+
+        int refreshSeconds = stock.getRefresh();
+        if (refreshSeconds <= 0) return;
+
+        refreshTimeline = new Timeline(
+                new KeyFrame(Duration.seconds(refreshSeconds), event -> {
+                    stock.refreshQuote();
+                    updateLabels(stock);
+                })
+        );
+
+        refreshTimeline.setCycleCount(Timeline.INDEFINITE);
+        refreshTimeline.play();
+    }
+
+    // 라벨 업데이트
+    private void updateLabels(Stocks stock) {
+        double current = stock.currentPrice;
+
+        // 텍스트 색상 결정
+        String color;
+        if (previousPrice < 0) {
+            color = "lightgray"; // 첫 표시
+        } else if (current > previousPrice) {
+            color = "red"; // 상승
+        } else if (current < previousPrice) {
+            color = "blue"; // 하락
+        } else {
+            color = "lightgray"; // 동일
+        }
+
+        priceLabel.setText("$ " + String.format("%,.2f", stock.currentPrice));
+        priceLabel.setStyle("-fx-font-size: " + _PIP_SettingsFontSize.getFontSize() + "px; -fx-text-fill: " + color + ";" +
+                "-fx-effect: dropshadow(gaussian, black, 2, 0.3, 0, 0);");
+
+        previousPrice = current;
+
+        System.out.println("🔄 [" + stock.getTicker() + "] PIP 정보 자동 새로고침");
     }
 
     // 테두리 설정 스타일 적용

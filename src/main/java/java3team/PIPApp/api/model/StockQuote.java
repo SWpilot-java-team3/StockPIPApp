@@ -1,31 +1,29 @@
-package api.finnhub.model;
+package api.model;
 
+import com.google.gson.annotations.SerializedName;
 
-// JSON 라이브러리(Gson) 어노테이션 사용 시 필요:
-// import com.google.gson.annotations.SerializedName;
-
-/**
- * Finnhub API의 주식 시세(Quote) 응답을 나타내는 데이터 모델 클래스입니다.
- * 필드 이름은 Finnhub API 문서에 따라 JSON 키와 매칭되어야 합니다.
- * (Gson 라이브러리를 사용할 경우 @SerializedName 어노테이션으로 매핑 가능)
- */
 public class StockQuote {
 
-    // @SerializedName("c") // 현재 가격
+    @SerializedName("c")
     private double currentPrice;
-    // @SerializedName("h") // 당일 최고가
+
+    @SerializedName("h")
     private double highPrice;
-    // @SerializedName("l") // 당일 최저가
+
+    @SerializedName("l")
     private double lowPrice;
-    // @SerializedName("o") // 당일 시초가
+
+    @SerializedName("o")
     private double openPrice;
-    // @SerializedName("pc") // 전일 종가 (Previous Close)
+
+    @SerializedName("pc")
     private double previousClosePrice;
 
-    // 기본 생성자 (JSON 파싱을 위해 필요)
-    public StockQuote() {}
+    // 기본 생성자 (Gson 파싱용)
+    public StockQuote() {
+    }
 
-    // 모든 필드를 포함하는 생성자 (선택 사항)
+    // 전체 필드를 사용하는 생성자
     public StockQuote(double currentPrice, double highPrice, double lowPrice, double openPrice, double previousClosePrice) {
         this.currentPrice = currentPrice;
         this.highPrice = highPrice;
@@ -34,7 +32,7 @@ public class StockQuote {
         this.previousClosePrice = previousClosePrice;
     }
 
-    // Getter 및 Setter 메소드
+    // Getter & Setter
     public double getCurrentPrice() {
         return currentPrice;
     }
@@ -77,12 +75,12 @@ public class StockQuote {
 
     @Override
     public String toString() {
-        return "StockQuote{" +
-                "currentPrice=" + currentPrice +
-                ", highPrice=" + highPrice +
-                ", lowPrice=" + lowPrice +
-                ", openPrice=" + openPrice +
-                ", previousClosePrice=" + previousClosePrice +
+        return "📊 StockQuote {" +
+                "현재가 = " + currentPrice +
+                ", 시가 = " + openPrice +
+                ", 고가 = " + highPrice +
+                ", 저가 = " + lowPrice +
+                ", 전일 종가 = " + previousClosePrice +
                 '}';
     }
 }
