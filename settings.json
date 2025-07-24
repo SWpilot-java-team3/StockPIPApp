@@ -13,5 +13,20 @@
     "exchange": "NASDAQ NMS - GLOBAL MARKET",
     "ipoDate": "1980-12-12",
     "marketCapitalization": 3202241.040089
+  },
+  {
+    "ticker": "KKKGF",
+    "name": "Kyokuto Kaihatsu Kogyo Co Ltd",
+    "targetPrice": 400.0,
+    "stopPrice": 200.0,
+    "refresh": 10,
+    "refreshMinute": 0,
+    "refreshSecond": 10,
+    "industry": "Machinery",
+    "country": "JP",
+    "currency": "JPY",
+    "exchange": "TOKYO STOCK EXCHANGE-TOKYO PRO MARKET",
+    "ipoDate": "1989-12-01",
+    "marketCapitalization": 94634.017193
   }
 ]
